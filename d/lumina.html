@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Análise de Presença Digital · Magic Core</title>
+<style>
+  :root{
+    --bg:#0E0E10;
+    --surface:#17171A;
+    --surface-2:#1D1D21;
+    --line:#2A2A2E;
+    --ink:#F2F0EA;
+    --ink-dim:#9A988F;
+    --ink-faint:#67655E;
+    --gold:#C9A24B;
+    --gold-soft:#9C7F3E;
+    --crit:#C25A4A;
+    --warn:#C9A24B;
+    --ok:#6E8B6A;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono","SFMono-Regular",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:17px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    padding:0 24px;
+  }
+  .doc{max-width:760px;margin:0 auto;padding:72px 0 96px}
+
+  /* ---- atmosphere ---- */
+  .dots{
+    position:fixed;inset:0;z-index:0;pointer-events:none;
+    background-image:radial-gradient(circle at center, rgba(201,162,75,.10) 1px, transparent 1.4px);
+    background-size:26px 26px;
+    -webkit-mask-image:radial-gradient(circle at 50% 18%, #000 0%, transparent 60%);
+    mask-image:radial-gradient(circle at 50% 18%, #000 0%, transparent 60%);
+    opacity:.5;
+  }
+  .doc{position:relative;z-index:1}
+
+  /* ---- header ---- */
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--gold);margin-bottom:28px;
+    display:flex;align-items:center;gap:12px;
+  }
+  .eyebrow::after{content:"";flex:1;height:1px;background:var(--line)}
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:14px}
+  h1.company{
+    font-family:var(--serif);
+    font-weight:600;
+    font-size:clamp(38px,7vw,60px);
+    line-height:1.02;
+    letter-spacing:-.01em;
+    margin-bottom:18px;
+  }
+  .meta{
+    font-family:var(--mono);font-size:12.5px;color:var(--ink-faint);
+    display:flex;flex-wrap:wrap;gap:6px 22px;padding-top:18px;border-top:1px solid var(--line);
+  }
+  .meta b{color:var(--ink-dim);font-weight:400}
+
+  /* ---- verdict (hero) ---- */
+  .verdict{margin:64px 0 24px}
+  .verdict .label{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:20px}
+  .verdict p{
+    font-family:var(--serif);
+    font-size:clamp(24px,3.6vw,31px);
+    line-height:1.32;
+    letter-spacing:-.005em;
+  }
+  .verdict .accent{color:var(--gold);font-style:italic}
+
+  /* ---- score ---- */
+  .score-row{
+    display:flex;align-items:center;gap:28px;
+    margin:40px 0 8px;padding:26px 28px;
+    background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  }
+  .score-num{font-family:var(--serif);font-size:56px;line-height:1;color:var(--gold);font-weight:600}
+  .score-num small{font-size:20px;color:var(--ink-faint)}
+  .score-txt{flex:1}
+  .score-txt .t{font-size:14px;color:var(--ink-dim);margin-bottom:10px}
+  .bar{height:7px;background:var(--surface-2);border-radius:99px;overflow:hidden}
+  .bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--crit),var(--gold));border-radius:99px}
+
+  /* ---- section ---- */
+  section{margin-top:64px}
+  .s-head{display:flex;align-items:baseline;gap:14px;margin-bottom:26px}
+  .s-num{font-family:var(--mono);font-size:12px;color:var(--gold-soft);letter-spacing:.1em}
+  .s-head h2{font-family:var(--serif);font-weight:600;font-size:26px;letter-spacing:-.01em}
+  .s-head p{flex:1;text-align:right;color:var(--ink-faint);font-size:13px;font-family:var(--mono)}
+
+  /* ---- good list ---- */
+  .good{background:var(--surface);border:1px solid var(--line);border-left:2px solid var(--ok);border-radius:0 12px 12px 0;padding:22px 26px;margin-bottom:14px}
+  .good h3{font-size:16px;margin-bottom:6px;font-weight:600}
+  .good p{color:var(--ink-dim);font-size:15px}
+
+  /* ---- findings ---- */
+  .finding{
+    background:var(--surface);border:1px solid var(--line);border-radius:14px;
+    padding:24px 26px;margin-bottom:16px;
+    display:grid;grid-template-columns:1fr auto;gap:8px 28px;align-items:start;
+  }
+  .finding.crit{border-left:2px solid var(--crit)}
+  .finding.warn{border-left:2px solid var(--warn)}
+  .f-main{min-width:0}
+  .f-top{display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+  .f-dim{font-size:17px;font-weight:600}
+  .tag{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:4px 9px;border-radius:99px}
+  .tag.crit{color:var(--crit);background:rgba(194,90,74,.12);border:1px solid rgba(194,90,74,.3)}
+  .tag.warn{color:var(--gold);background:rgba(201,162,75,.1);border:1px solid rgba(201,162,75,.3)}
+  .f-main p{color:var(--ink-dim);font-size:15px;line-height:1.55}
+  .f-cost{
+    text-align:right;font-family:var(--mono);
+    border-left:1px solid var(--line);padding-left:24px;align-self:stretch;
+    display:flex;flex-direction:column;justify-content:center;min-width:120px;
+  }
+  .f-cost .c-lab{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px}
+  .f-cost .c-val{font-size:17px;color:var(--gold);font-weight:500;line-height:1.25}
+
+  /* ---- compare ---- */
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .col{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:24px 26px}
+  .col.you{border-top:2px solid var(--crit)}
+  .col.them{border-top:2px solid var(--ok)}
+  .col .who{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:16px}
+  .col ul{list-style:none}
+  .col li{font-size:14.5px;color:var(--ink-dim);padding:9px 0 9px 22px;position:relative;border-top:1px solid var(--line);line-height:1.45}
+  .col li:first-child{border-top:0}
+  .col.you li::before{content:"✕";position:absolute;left:0;color:var(--crit);font-size:12px}
+  .col.them li::before{content:"✓";position:absolute;left:0;color:var(--ok);font-size:12px}
+
+  /* ---- the bill ---- */
+  .bill{
+    background:linear-gradient(160deg,var(--surface-2),var(--surface));
+    border:1px solid var(--gold-soft);border-radius:18px;
+    padding:38px 36px;text-align:center;
+  }
+  .bill .lead{color:var(--ink-dim);font-size:15px;margin-bottom:8px}
+  .bill .big{font-family:var(--serif);font-size:clamp(44px,9vw,68px);color:var(--gold);font-weight:600;line-height:1;letter-spacing:-.02em;margin:6px 0}
+  .bill .per{font-family:var(--mono);font-size:13px;color:var(--ink-faint);letter-spacing:.08em}
+  .bill .note{margin-top:20px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-faint);max-width:520px;margin-inline:auto;line-height:1.5}
+
+  /* ---- solution ---- */
+  .sol{display:grid;gap:12px}
+  .sol-item{display:grid;grid-template-columns:auto 1fr;gap:18px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px 24px;align-items:start}
+  .sol-n{font-family:var(--mono);font-size:13px;color:var(--gold);padding-top:2px}
+  .sol-item h3{font-size:16px;font-weight:600;margin-bottom:5px}
+  .sol-item p{font-size:14.5px;color:var(--ink-dim);line-height:1.5}
+
+  /* ---- cta ---- */
+  .cta{margin-top:56px;text-align:center;padding:44px 32px;border:1px solid var(--line);border-radius:18px;background:var(--surface)}
+  .cta h2{font-family:var(--serif);font-size:28px;font-weight:600;margin-bottom:12px;letter-spacing:-.01em}
+  .cta p{color:var(--ink-dim);font-size:15.5px;max-width:460px;margin:0 auto 26px}
+  .btn{
+    display:inline-block;font-family:var(--sans);font-weight:600;font-size:15px;
+    background:var(--ink);color:#0E0E10;text-decoration:none;
+    padding:15px 32px;border-radius:99px;transition:transform .15s ease,opacity .15s ease;
+  }
+  .btn:hover{transform:translateY(-1px);opacity:.92}
+  .cta .alt{display:block;margin-top:16px;font-family:var(--mono);font-size:12.5px;color:var(--ink-faint);letter-spacing:.05em}
+
+  footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-family:var(--mono);font-size:11px;color:var(--ink-faint);letter-spacing:.06em}
+
+  /* ---- motion ---- */
+  @media (prefers-reduced-motion:no-preference){
+    .reveal{opacity:0;transform:translateY(14px);animation:rise .7s cubic-bezier(.2,.7,.2,1) forwards}
+    @keyframes rise{to{opacity:1;transform:none}}
+  }
+
+  /* ---- responsive ---- */
+  @media (max-width:620px){
+    body{font-size:16px;padding:0 18px}
+    .doc{padding:48px 0 72px}
+    .finding{grid-template-columns:1fr}
+    .f-cost{border-left:0;border-top:1px solid var(--line);padding:14px 0 0;flex-direction:row;justify-content:space-between;align-items:baseline}
+    .f-cost .c-lab{margin:0}
+    .compare{grid-template-columns:1fr}
+    .score-row{flex-direction:column;align-items:flex-start;gap:18px}
+    .s-head{flex-direction:column;gap:6px}
+    .s-head p{text-align:left}
+  }
+  @media print{
+    .dots{display:none}
+    .reveal{opacity:1;transform:none;animation:none}
+    body{padding:0}
+    section,.cta{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+<div class="dots"></div>
+<main class="doc">
+
+  <!-- ============ CABEÇALHO ============ -->
+  <header class="reveal">
+    <div class="eyebrow">Magic Core · Diagnóstico</div>
+    <div class="kicker">Análise de Presença Digital</div>
+    <h1 class="company">Clínica Lumina Estética</h1>
+    <div class="meta">
+      <span><b>Segmento:</b> Estética · Curitiba/PR</span>
+      <span><b>Data:</b> 08 jun 2026</span>
+      <span><b>Análise por:</b> Magic TI</span>
+    </div>
+  </header>
+
+  <!-- ============ VEREDITO ============ -->
+  <div class="verdict reveal">
+    <div class="label">Veredito</div>
+    <p>A Lumina aparece para quem <span class="accent">já conhece</span> a Lumina.
+    Para a mulher que está procurando uma clínica de estética em Curitiba agora,
+    no Google e no Instagram, <span class="accent">a clínica simplesmente não existe</span>.
+    O problema não é o serviço. É que ninguém novo chega até ele.</p>
+  </div>
+
+  <div class="score-row reveal">
+    <div class="score-num">38<small>/100</small></div>
+    <div class="score-txt">
+      <div class="t">Índice de Presença Digital — uma clínica bem posicionada na sua região fica entre 75 e 90.</div>
+      <div class="bar"><i style="width:38%"></i></div>
+    </div>
+  </div>
+
+  <!-- ============ O QUE JÁ FUNCIONA ============ -->
+  <section class="reveal">
+    <div class="s-head">
+      <span class="s-num">01</span>
+      <h2>O que já está a seu favor</h2>
+      <p>Base sólida pra construir</p>
+    </div>
+    <div class="good">
+      <h3>O serviço tem reputação</h3>
+      <p>4,9 no Google com avaliações reais e elogiosas. Isso prova que quem chega, fica satisfeito. O gargalo está em fazer mais gente chegar, não na entrega.</p>
+    </div>
+    <div class="good">
+      <h3>Identidade visual no Instagram</h3>
+      <p>O perfil tem estética cuidada e consistente. A matéria-prima de uma marca forte já existe. Falta transformar esse alcance em agendamento.</p>
+    </div>
+  </section>
+
+  <!-- ============ ONDE PERDE CLIENTE ============ -->
+  <section class="reveal">
+    <div class="s-head">
+      <span class="s-num">02</span>
+      <h2>Onde você perde cliente</h2>
+      <p>Custo estimado por mês →</p>
+    </div>
+
+    <div class="finding crit">
+      <div class="f-main">
+        <div class="f-top"><span class="f-dim">Site</span><span class="tag crit">Crítico</span></div>
+        <p>A clínica não tem site. Quem pesquisa “clínica de estética em Curitiba” no Google não encontra a Lumina em lugar nenhum, e cai direto na concorrência que aparece. É o cliente de maior intenção, o que já decidiu contratar, indo embora antes de saber que você existe.</p>
+      </div>
+      <div class="f-cost"><span class="c-lab">Estimativa</span><span class="c-val">~R$ 5.400</span></div>
+    </div>
+
+    <div class="finding crit">
+      <div class="f-main">
+        <div class="f-top"><span class="f-dim">Resposta ao contato</span><span class="tag crit">Crítico</span></div>
+        <p>O único canal é o WhatsApp na bio. Mensagem que chega à noite ou no fim de semana fica sem resposta até o próximo expediente, e boa parte dessas pessoas já fechou com outra clínica antes de você abrir o celular. Não existe resposta imediata nem acompanhamento de quem não respondeu.</p>
+      </div>
+      <div class="f-cost"><span class="c-lab">Estimativa</span><span class="c-val">~R$ 4.800</span></div>
+    </div>
+
+    <div class="finding crit">
+      <div class="f-main">
+        <div class="f-top"><span class="f-dim">Tráfego pago</span><span class="tag crit">Crítico</span></div>
+        <p>Nenhum anúncio rodando. Todo o alcance depende do que o algoritmo entrega de graça, ou seja, quase nada de gente nova. Enquanto isso, há concorrentes pagando pra aparecer exatamente para o seu público em Curitiba.</p>
+      </div>
+      <div class="f-cost"><span class="c-lab">Estimativa</span><span class="c-val">indireto</span></div>
+    </div>
+
+    <div class="finding warn">
+      <div class="f-main">
+        <div class="f-top"><span class="f-dim">Google Meu Negócio</span><span class="tag warn">Atenção</span></div>
+        <p>O perfil existe, mas está incompleto: sem fotos recentes, sem lista de serviços e sem responder avaliações. Você aparece no mapa, mas não convence quem te encontra ali.</p>
+      </div>
+      <div class="f-cost"><span class="c-lab">Estimativa</span><span class="c-val">~R$ 1.800</span></div>
+    </div>
+
+    <div class="finding warn">
+      <div class="f-main">
+        <div class="f-top"><span class="f-dim">Conteúdo que converte</span><span class="tag warn">Atenção</span></div>
+        <p>Os posts mostram procedimentos e bastidores, mas nenhum convida a agendar e nenhum captura o contato de quem demonstrou interesse. É conteúdo bonito que entretém, não conteúdo que vende.</p>
+      </div>
+      <div class="f-cost"><span class="c-lab">Estimativa</span><span class="c-val">indireto</span></div>
+    </div>
+  </section>
+
+  <!-- ============ CONCORRÊNCIA ============ -->
+  <section class="reveal">
+    <div class="s-head">
+      <span class="s-num">03</span>
+      <h2>Você e a concorrência, lado a lado</h2>
+      <p>Mesma cliente, escolhas diferentes</p>
+    </div>
+    <div class="compare">
+      <div class="col you">
+        <div class="who">Lumina hoje</div>
+        <ul>
+          <li>Invisível no Google</li>
+          <li>Resposta só em horário comercial</li>
+          <li>Zero anúncio ativo</li>
+          <li>Perfil do Google incompleto</li>
+        </ul>
+      </div>
+      <div class="col them">
+        <div class="who">Concorrente próximo</div>
+        <ul>
+          <li>1º lugar na busca por estética na região</li>
+          <li>Responde em minutos, todo dia</li>
+          <li>Anúncios rodando pro seu público</li>
+          <li>Perfil completo, com fotos e avaliações respondidas</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ A CONTA ============ -->
+  <section class="reveal">
+    <div class="s-head">
+      <span class="s-num">04</span>
+      <h2>A conta de tudo isso</h2>
+      <p>Estimativa conservadora</p>
+    </div>
+    <div class="bill">
+      <div class="lead">Clientes que provavelmente já estão indo embora todo mês,</div>
+      <div class="big">~R$ 12.000</div>
+      <div class="per">por mês deixados na mesa</div>
+      <div class="note">Base do cálculo: cerca de 40 contatos por mês, metade perdida por demora na resposta ou por nem chegar até você, com ticket médio de R$ 600. Número proposital de andar de baixo, a realidade tende a ser maior.</div>
+    </div>
+  </section>
+
+  <!-- ============ SOLUÇÃO ============ -->
+  <section class="reveal">
+    <div class="s-head">
+      <span class="s-num">05</span>
+      <h2>Como a MazyOS resolve</h2>
+      <p>Em até 30 dias</p>
+    </div>
+    <div class="sol">
+      <div class="sol-item">
+        <span class="sol-n">A</span>
+        <div><h3>Aparecer para quem procura</h3><p>Um site enxuto e otimizado mais o perfil do Google ajustado, pra Lumina surgir quando a cliente pesquisa estética em Curitiba, e não a concorrência.</p></div>
+      </div>
+      <div class="sol-item">
+        <span class="sol-n">B</span>
+        <div><h3>Atendimento que não dorme</h3><p>Resposta imediata a cada contato, a qualquer hora, com acompanhamento automático de quem não fechou na hora. Ninguém mais escapa por demora.</p></div>
+      </div>
+      <div class="sol-item">
+        <span class="sol-n">C</span>
+        <div><h3>Conteúdo que chama pra agir</h3><p>Posts com chamada clara pra agendar e captura de contato de quem se interessa, transformando o alcance que já existe em agenda cheia.</p></div>
+      </div>
+      <div class="sol-item">
+        <span class="sol-n">D</span>
+        <div><h3>Tráfego pago controlado</h3><p>Anúncios mirados na sua região e no seu público, pra trazer cliente novo de forma previsível em vez de torcer pelo algoritmo.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CTA ============ -->
+  <div class="cta reveal">
+    <h2>Vamos transformar esse diagnóstico em agenda cheia?</h2>
+    <p>Uma conversa de 15 minutos pra eu te mostrar exatamente como sairíamos do cenário de hoje pro de 30 dias. Sem compromisso.</p>
+    <a class="btn" href="#">Agendar conversa →</a>
+    <span class="alt">ou responda este relatório com a palavra “bora”</span>
+  </div>
+
+  <footer>
+    <span>Magic Core · um sistema da Magic TI</span>
+    <span>Diagnóstico confidencial · 2026</span>
+  </footer>
+
+</main>
+</body>
+</html>
